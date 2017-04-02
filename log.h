@@ -7,8 +7,6 @@
 #ifndef _LOG_H
 #define _LOG_H
 
-#include <stdlib.h>
-
 enum {
 	LOG_DEBUG = 0,
 	LOG_INFO,
@@ -17,12 +15,7 @@ enum {
 	LOG_DIE,
 };
 
-extern time_t current_time;
-extern struct timeval time_of_day;
-
 int set_log_level(int min_level);
-
-void update_sys_time(void);
 
 void write_log(const char *file, int line, int level, const char *fmt, ...);
 

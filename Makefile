@@ -1,4 +1,4 @@
-CBASE_OBJ = stream.o buffer.o event.o rbtree.o pool.o log.o
+CBASE_OBJ = stream.o buffer.o event.o rbtree.o pool.o log.o systime.o
 CBASE_TEST = event_test buffer_test rbtree_test stream_test pool_test
 CBASE_STATIC = libcbase.a
 CBASE_DYNAMIC = libcbase.so
@@ -15,19 +15,19 @@ $(CBASE_DYNAMIC): $(CBASE_OBJ)
 
 test: $(CBASE_TEST)
 
-event_test: event_test.c event.o log.o rbtree.o
+event_test: event_test.c event.o log.o rbtree.o systime.o
 	gcc -o $@ $(CFLAGS) $^
 
-buffer_test: buffer_test.c buffer.o log.o pool.o
+buffer_test: buffer_test.c buffer.o log.o pool.o systime.o
 	gcc -o $@ $(CFLAGS) $^
 
-rbtree_test: rbtree_test.c rbtree.o log.o
+rbtree_test: rbtree_test.c rbtree.o log.o systime.o
 	gcc -o $@ $(CFLAGS) $^
 
-stream_test: stream_test.c stream.o buffer.o event.o log.o rbtree.o pool.o
+stream_test: stream_test.c stream.o buffer.o event.o log.o rbtree.o pool.o systime.o
 	gcc -o $@ $(CFLAGS) $^
 
-pool_test: pool_test.c pool.o log.o
+pool_test: pool_test.c pool.o log.o systime.o
 	gcc -o $@ $(CFLAGS) $^
 
 stream.o: stream.c stream.h
@@ -46,6 +46,9 @@ pool.o: pool.c pool.h
 	gcc -o $@ -c $(CFLAGS) $<
 
 log.o: log.c log.h
+	gcc -o $@ -c $(CFLAGS) $<
+
+systime.o: systime.c systime.h
 	gcc -o $@ -c $(CFLAGS) $<
 
 clean:

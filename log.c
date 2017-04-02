@@ -5,11 +5,9 @@
  */
 
 #include <log.h>
+#include <systime.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <time.h>
-#include <unistd.h>
-#include <sys/time.h>
 
 static int log_level = LOG_WARN;
 static const char *str_levels[] = {
@@ -19,12 +17,6 @@ static const char *str_levels[] = {
 	[LOG_ERROR]	= "ERROR",
 	[LOG_DIE]	= "DIE",
 };
-
-static char str_time[] = "2017-01-25 23:41:36";
-static pid_t pid;
-
-time_t current_time;
-struct timeval time_of_day;
 
 int set_log_level(int min_level)
 {
@@ -36,14 +28,6 @@ int set_log_level(int min_level)
 	else if (log_level > LOG_DIE)
 		log_level = LOG_DIE;
 	return ret;
-}
-
-void update_sys_time(void)
-{
-	pid = getpid();
-	current_time = time(NULL);
-	gettimeofday(&time_of_day, NULL);
-	strftime(str_time, sizeof(str_time), "%F %T", localtime(&current_time));
 }
 
 void write_log(const char *file, int line, int level, const char *fmt, ...)

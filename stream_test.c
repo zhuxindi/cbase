@@ -6,6 +6,7 @@
 
 #include <stream.h>
 #include <log.h>
+#include <systime.h>
 #include <unistd.h>
 #include <fcntl.h>
 

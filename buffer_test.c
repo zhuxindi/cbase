@@ -6,6 +6,7 @@
 
 #include <buffer.h>
 #include <log.h>
+#include <systime.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -26,6 +27,7 @@ int main()
 	int i;
 
 	update_sys_time();
+	set_log_level(LOG_DEBUG);
 
 	b = buffer_alloc(20, 0);
 	if (!b)

@@ -20,9 +20,9 @@ struct event {
 	int type;		/* EVENT_T_XXX */
 	event_handler handler;	/* callback */
 	void *data;		/* callback argument */
-	unsigned long interval;	/* timeout for timer event */
+	unsigned long when;	/* timeout for timer event */
 	struct event *buddy;	/* maybe two events point to one fd */
-	struct rbtree_node node;/* timer event tree node */
+	struct rb_node node;	/* timer event tree node */
 	unsigned int active:1;	/* if added before */
 };
 

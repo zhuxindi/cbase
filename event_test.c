@@ -6,6 +6,7 @@
 
 #include <event.h>
 #include <log.h>
+#include <systime.h>
 
 static struct event rev, wev, timer;
 
@@ -22,6 +23,7 @@ void callback(void *p)
 int main()
 {
 	update_sys_time();
+	set_log_level(LOG_DEBUG);
 
 	rev.fd = 0;
 	rev.type = EVENT_T_READ;
@@ -33,7 +35,7 @@ int main()
 	wev.handler = callback;
 	wev.data = &wev;
 
-	timer.interval = 5000;
+	timer.when = current_msecs + 5000;
 	timer.type = EVENT_T_TIMER;
 	timer.handler = callback;
 	timer.data = &timer;

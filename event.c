@@ -6,6 +6,7 @@
 
 #include <event.h>
 #include <log.h>
+#include <systime.h>
 #include <utils.h>
 #include <sys/epoll.h>
 #include <errno.h>
@@ -31,8 +32,7 @@ static struct epoll_event *events;
 static int maxevents;
 
 /* timer events */
-static struct rbtree timer_rbtree;
-static struct rbtree_node timer_rbtree_sentinel;
+static struct rb_root timer_rbtree = RB_ROOT;
 
 int event_init(int max_events)
 {
@@ -55,9 +55,6 @@ int event_init(int max_events)
 		return -1;
 	}
 
-	/* init timer event tree */
-	rbtree_init(&timer_rbtree, &timer_rbtree_sentinel, rbtree_insert_value);
-
 	log_debug("init events max_events %d", maxevents);
 	return 0;
 }
@@ -69,35 +66,31 @@ void event_deinit(void)
 	free(events);
 }
 
-static inline unsigned long event_now(void)
+static inline struct event *__event_min_timer(void)
 {
-	return (unsigned long)time_of_day.tv_sec * 1000 +
-		(unsigned long)time_of_day.tv_usec / 1000;
+	struct rb_node *n = rb_min_node(&timer_rbtree);
+	return n ? rb_entry(n, struct event, node) : NULL;
+}
+
+static inline void __event_del_timer(struct event *ev)
+{
+	rb_erase(&ev->node, &timer_rbtree);
 }
 
 int event_process_timer(int limit)
 {
-	unsigned long now = event_now();
-	int n = 0;
+	int n;
 
 	/* iterate timer tree to process timeouted timers */
-	while (n < limit) {
-		struct rbtree_node *min = rbtree_min(&timer_rbtree);
+	for (n = 0; n < limit; n++) {
+		struct event *min = __event_min_timer();
 
-		if (min == &timer_rbtree_sentinel)
+		if (!min || min->when > current_msecs)
 			break;
 
-		if (min->key <= now) {
-			struct event *ev = container_of(min, struct event, node);
-
-			rbtree_delete(&timer_rbtree, min);
-			ev->active = 0;
-			ev->handler(ev->data);
-			n++;
-			continue;
-		}
-
-		break;
+		__event_del_timer(min);
+		min->active = 0;
+		min->handler(min->data);
 	}
 
 	return n;
@@ -135,13 +128,12 @@ int event_process_io(int limit)
 
 int event_wait(void)
 {
-	struct rbtree_node *min = rbtree_min(&timer_rbtree);
-	unsigned long now = event_now();
+	struct event *min = __event_min_timer();
 	int timeout = -1, n;
 
 	/* have timer events, then get the latest timeout */
-	if (min != &timer_rbtree_sentinel)
-		timeout = (min->key > now) ? (int)(min->key - now) : 0;
+	if (min)
+		timeout = (min->when > current_msecs) ? (int)(min->when - current_msecs) : 0;
 
 	/* waiting for events coming */
 	log_debug("waiting events timeout %d", timeout);
@@ -173,19 +165,39 @@ int event_wait(void)
 	return n;
 }
 
+static inline void __event_add_timer(struct event *ev)
+{
+	struct rb_node **p = &(timer_rbtree.rb_node);
+	struct rb_node *parent = NULL;
+	struct event *tmp;
+
+	while (*p) {
+		parent = *p;
+		tmp = rb_entry(parent, struct event, node);
+
+		if (ev->when < tmp->when)
+			p = &((*p)->rb_left);
+		else
+			p = &((*p)->rb_right);
+	}
+
+	rb_link_node(&ev->node, parent, p);
+	rb_insert_color(&ev->node, &timer_rbtree);
+}
+
 static int event_add_timer(struct event *ev)
 {
-	if (ev->active && event_del(ev) < 0)
-		return -1;
+	if (ev->active) {
+		__event_del_timer(ev);
+		ev->active = 0;
+	}
 
-	/* set key to timeout and insert tree */
-	ev->node.key = event_now() + ev->interval;
-	rbtree_insert(&timer_rbtree, &ev->node);
+	__event_add_timer(ev);
 
 	/* active event */
 	ev->active = 1;
-	log_debug("register %s event %p done interval %lums",
-		  event_names[EVENT_T_TIMER], ev, ev->interval);
+	log_debug("register %s event %p done timeout @%lums",
+		  event_names[EVENT_T_TIMER], ev, ev->when);
 	return 0;
 }
 
@@ -264,7 +276,8 @@ static int event_del_timer(struct event *ev)
 	if (!ev->active)
 		return 0;
 
-	rbtree_delete(&timer_rbtree, &ev->node);
+	__event_del_timer(ev);
+
 	ev->active = 0;
 	log_debug("unregister %s event %p done", event_names[EVENT_T_TIMER], ev);
 	return 0;

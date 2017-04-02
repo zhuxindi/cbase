@@ -6,91 +6,112 @@
 
 #include <rbtree.h>
 #include <log.h>
+#include <systime.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void print_node(struct rbtree_node *node, struct rbtree_node *sentinel)
+struct my_node {
+	struct rb_node node;
+	unsigned long key;
+};
+
+void print_tree(const struct rb_root *tree)
 {
-	log_info("%p left=%p right=%p key=%lu", node,
-		 node->left != sentinel ? node->left : NULL,
-		 node->right != sentinel ? node->right : NULL, node->key);
-	if (node->left != sentinel)
-		print_node(node->left, sentinel);
-	if (node->right != sentinel)
-		print_node(node->right, sentinel);
+	struct rb_node *n;
+
+	for (n = rb_first(tree); n; n = rb_next(n))
+		log_info(">>>%p left=%p right=%p key=%lu", n, n->rb_left, n->rb_right,
+			 rb_entry(n, struct my_node, node)->key);
 }
 
-void print_tree(const struct rbtree *tree)
+struct my_node *search_node(const struct rb_root *tree, unsigned long key)
 {
-	if (tree->root != tree->sentinel)
-		print_node(tree->root, tree->sentinel);
-}
+	struct rb_node *n = tree->rb_node;
+	struct my_node *node;
 
-struct rbtree_node *search_tree(const struct rbtree *tree, unsigned long key)
-{
-	struct rbtree_node *root = tree->root;
-	struct rbtree_node *sentinel = tree->sentinel;
-
-	while (1) {
-		struct rbtree_node *p;
-
-		if (key < root->key)
-			p = root->left;
-		else if (key < root->key)
-			p = root->right;
+	while (n) {
+		node = rb_entry(n, struct my_node, node);
+		if (key < node->key)
+			n = n->rb_left;
+		else if (key > node->key)
+			n = n->rb_right;
 		else
-			return p;
-
-		if (p == sentinel)
-			return p;
-
-		root = p;
+			return node;
 	}
+	return NULL;
+}
+
+void insert_node(struct rb_root *tree, struct my_node *node)
+{
+	struct rb_node **p = &(tree->rb_node);
+	struct rb_node *parent = NULL;
+	struct my_node *tmp;
+
+	while (*p) {
+		parent = *p;
+		tmp = rb_entry(parent, struct my_node, node);
+
+		if (node->key < tmp->key)
+			p = &((*p)->rb_left);
+		else
+			p = &((*p)->rb_right);
+	}
+
+	rb_link_node(&node->node, parent, p);
+	rb_insert_color(&node->node, tree);
+}
+
+struct my_node *min_node(const struct rb_root *tree)
+{
+	struct rb_node *n = rb_min_node(tree);
+	return n ? rb_entry(n, struct my_node, node): NULL;
 }
 
 int main()
 {
-	struct rbtree tree;
-	struct rbtree_node sentinel;
-	struct rbtree_node nodes[10];
-	struct rbtree_node *p;
+	struct rb_root tree = RB_ROOT;
+	struct my_node nodes[10];
+	struct my_node *p;
 	int i;
 	unsigned long key;
 
 	update_sys_time();
 	set_log_level(LOG_DEBUG);
 
-	rbtree_init(&tree, &sentinel, rbtree_insert_value);
 	for (i = 0; i < 10; i++) {
 		nodes[i].key = rand() % 10;
 		log_info("add %p key=%lu", &nodes[i], nodes[i].key);
-		rbtree_insert(&tree, &nodes[i]);
+		insert_node(&tree, &nodes[i]);
+		print_tree(&tree);
 	}
-	print_tree(&tree);
 
-	p = rbtree_min(&tree);
-	log_info("min=%p key=%lu", p, p->key);
+	p = min_node(&tree);
+	log_info("min %p key=%lu", p, p->key);
 
 	key = 1;
-	p = search_tree(&tree, key);
-	if (p != &sentinel)
+	p = search_node(&tree, key);
+	if (p)
 		log_info("found %p key=%lu", p, key);
 	else
 		log_info("not found key=%lu", key);
 
 	log_info("del %p key=%lu", &nodes[2], nodes[2].key);
-	rbtree_delete(&tree, &nodes[2]);
-	log_info("del %p key=%lu", &nodes[5], nodes[5].key);
-	rbtree_delete(&tree, &nodes[5]);
-	log_info("del %p key=%lu", &nodes[9], nodes[9].key);
-	rbtree_delete(&tree, &nodes[9]);
+	rb_erase(&nodes[2].node, &tree);
 	print_tree(&tree);
 
-	p = rbtree_min(&tree);
-	log_info("min=%p key=%lu", p, p->key);
+	log_info("del %p key=%lu", &nodes[5], nodes[5].key);
+	rb_erase(&nodes[5].node, &tree);
+	print_tree(&tree);
 
-	p = search_tree(&tree, key);
-	if (p != &sentinel)
+	log_info("del %p key=%lu", &nodes[9], nodes[9].key);
+	rb_erase(&nodes[9].node, &tree);
+	print_tree(&tree);
+
+	p = min_node(&tree);
+	log_info("min %p key=%lu", p, p->key);
+
+	p = search_node(&tree, key);
+	if (p)
 		log_info("found %p key=%lu", p, key);
 	else
 		log_info("not found key=%lu", key);
