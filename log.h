@@ -7,6 +7,8 @@
 #ifndef _LOG_H
 #define _LOG_H
 
+#include <stdio.h>
+
 enum {
 	LOG_DEBUG = 0,
 	LOG_INFO,
@@ -16,6 +18,8 @@ enum {
 };
 
 int set_log_level(int min_level);
+
+FILE *set_log_file(FILE *f);
 
 void write_log(const char *file, int line, int level, const char *fmt, ...);
 

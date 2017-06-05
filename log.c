@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+static FILE *log_file;
 static int log_level = LOG_WARN;
 static const char *str_levels[] = {
 	[LOG_DEBUG]	= "DEBUG",
@@ -30,19 +31,37 @@ int set_log_level(int min_level)
 	return ret;
 }
 
+static inline FILE *__set_log_file(FILE *f)
+{
+	FILE *ret = log_file;
+
+	log_file = f;
+	return ret;
+}
+
+FILE *set_log_file(FILE *f)
+{
+	if (log_file)
+		fflush(log_file);
+	return __set_log_file(f ?: stdout);
+}
+
 void write_log(const char *file, int line, int level, const char *fmt, ...)
 {
+	if (!log_file)
+		__set_log_file(stdout);
+
 	if (level >= log_level) {
 		va_list va;
 		va_start(va, fmt);
-		printf("%s #%d %s:%d [%s] ", str_time, (int)pid, file, line, str_levels[level]);
-		vprintf(fmt, va);
-		printf("\n");
+		fprintf(log_file, "%s #%d %s:%d [%s] ", str_time, (int)pid, file, line, str_levels[level]);
+		vfprintf(log_file, fmt, va);
+		fprintf(log_file, "\n");
 		va_end(va);
 	}
 
 	if (level == LOG_DIE) {
-		fflush(stdout);
+		fflush(log_file);
 		_exit(1);
 	}
 }
