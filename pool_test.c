@@ -1,3 +1,9 @@
+/**
+ * File: pool_test.c
+ * Author: ZhuXindi
+ * Date: 2013-07-11
+ */
+
 #include <pool.h>
 
 int main()
