@@ -11,28 +11,6 @@
 
 static LIST_HEAD(pools);
 
-struct pool *pool_create(size_t size)
-{
-	const size_t align = sizeof(void *);
-	struct pool *pool;
-
-	/* alloc pool struct */
-	pool = calloc(1, sizeof(*pool));
-	if (!pool) {
-		log_error("calloc() error: %s", strerror(errno));
-		return NULL;
-	}
-
-	/* we need to write a next pointer in each trunk after pool_free,
-	 * so we need to adjust the size up to a multiple of align
-	 */
-	pool->size = ((size + align - 1) & -align);
-	list_add_tail(&pool->list, &pools);
-
-	log_debug("create pool %p size %lu", pool, size);
-	return pool;
-}
-
 void pool_flush(struct pool *pool)
 {
 	void *next = pool->free_list;
@@ -121,6 +99,16 @@ void *pool_alloc(struct pool *pool)
 	return ptr;
 }
 
+static void *pool_alloc_mem(struct pool *pool, size_t n)
+{
+	if (n > pool_size(pool)) {
+		log_error("can't alloc %lu bytes from pool %p", (long)n, pool);
+		return NULL;
+	}
+
+	return pool_alloc(pool);
+}
+
 void pool_free(struct pool *pool, void *ptr)
 {
 	/* link to free list */
@@ -130,4 +118,31 @@ void pool_free(struct pool *pool, void *ptr)
 		pool->free_list = (void *)ptr;
 		pool->used--;
 	}
+}
+
+struct pool *pool_create(size_t size)
+{
+	const size_t align = sizeof(void *);
+	struct pool *pool;
+
+	/* alloc pool struct */
+	pool = calloc(1, sizeof(*pool));
+	if (!pool) {
+		log_error("calloc() error: %s", strerror(errno));
+		return NULL;
+	}
+
+	pool->base.ops.destroy = (struct pool_base *(*)(struct pool_base *))pool_destroy;
+	pool->base.ops.alloc = (void *(*)(struct pool_base *, size_t))pool_alloc_mem;
+	pool->base.ops.free = (void (*)(struct pool_base *, void *))pool_free;
+	pool->base.ops.flush = (void (*)(struct pool_base *))pool_flush;
+
+	/* we need to write a next pointer in each trunk after pool_free,
+	 * so we need to adjust the size up to a multiple of align
+	 */
+	pool->size = ((size + align - 1) & -align);
+	list_add_tail(&pool->list, &pools);
+
+	log_debug("create pool %p size %lu", pool, size);
+	return pool;
 }

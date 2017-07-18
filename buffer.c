@@ -10,12 +10,12 @@
 #include <string.h>
 #include <errno.h>
 
-struct buffer *buffer_alloc(size_t bufsize, struct pool *pool)
+struct buffer *buffer_alloc(size_t bufsize, struct pool_base *pool)
 {
 	struct buffer *b;
 
 	/* allocate the structure's space and bufsize */
-	if (!pool || pool_size(pool) < bufsize + sizeof(struct buffer)) {
+	if (!pool) {
 		b = malloc(bufsize + sizeof(struct buffer));
 		if (!b) {
 			log_error("malloc() error: %s", strerror(errno));
@@ -23,7 +23,7 @@ struct buffer *buffer_alloc(size_t bufsize, struct pool *pool)
 		}
 		b->pool = NULL;
 	} else {
-		b = pool_alloc(pool);
+		b = pool->ops.alloc(pool, bufsize + sizeof(struct buffer));
 		if (!b) {
 			log_error("alloc buffer from pool %p failed", pool);
 			return NULL;
@@ -42,7 +42,8 @@ struct buffer *buffer_alloc(size_t bufsize, struct pool *pool)
 	return b;
 }
 
-struct buffer *buffer_separate(struct buffer *b, size_t n, struct pool *pool)
+struct buffer *buffer_separate(struct buffer *b, size_t n,
+			       struct pool_base *pool)
 {
 	struct buffer *child;
 
@@ -56,7 +57,7 @@ struct buffer *buffer_separate(struct buffer *b, size_t n, struct pool *pool)
 	}
 
 	/* only allocate the structure's space */
-	if (!pool || pool_size(pool) < sizeof(struct buffer)) {
+	if (!pool) {
 		child = malloc(sizeof(struct buffer));
 		if (!child) {
 			log_error("malloc() error: %s", strerror(errno));
@@ -64,7 +65,7 @@ struct buffer *buffer_separate(struct buffer *b, size_t n, struct pool *pool)
 		}
 		child->pool = NULL;
 	} else {
-		child = pool_alloc(pool);
+		child = pool->ops.alloc(pool, sizeof(struct buffer));
 		if (!child) {
 			log_error("alloc buffer from pool %p failed", pool);
 			return NULL;
@@ -103,7 +104,7 @@ static inline void __buffer_free(struct buffer *b)
 	if (--b->refcnt == 0) {
 		log_debug("free buffer %p", b);
 		if (b->pool)
-			pool_free(b->pool, b);
+			b->pool->ops.free(b->pool, b);
 		else
 			free(b);
 	}

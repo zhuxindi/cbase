@@ -5,11 +5,16 @@
  */
 
 #include <pool.h>
+#include <log.h>
+#include <systime.h>
 
 int main()
 {
 	struct pool *pool;
 	void *ptr;
+
+	update_sys_time();
+	set_log_level(LOG_DEBUG);
 
 	pool = pool_create(4);
 

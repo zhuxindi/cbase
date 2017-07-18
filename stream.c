@@ -84,7 +84,8 @@ static void stream_write_queue(struct stream *stream)
 			if (rc == -1) {
 				/* error occured */
 				if (errno != EWOULDBLOCK) {
-					log_error("write() error: %s", strerror(errno));
+					log_error("write() error: %s",
+						  strerror(errno));
 					stream->error = 1;
 				/* no more data */
 				} else
@@ -132,7 +133,8 @@ static void stream_write_handler(struct stream *stream)
 	stream_write_queue(stream);
 }
 
-void stream_init(struct stream *stream, int type, size_t rdbuf_size, struct pool *pool)
+void stream_init(struct stream *stream, int type, size_t rdbuf_size,
+		 struct pool_base *pool)
 {
 	log_debug("init stream %p rdbuf_size %lu", stream, rdbuf_size);
 

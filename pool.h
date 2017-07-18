@@ -10,7 +10,21 @@
 #include <stdlib.h>
 #include <list.h>
 
+struct pool_base;
+
+struct pool_ops {
+	struct pool_base *(*destroy)(struct pool_base *pool);
+	void *(*alloc)(struct pool_base *pool, size_t n);
+	void (*free)(struct pool_base *pool, void *ptr);
+	void (*flush)(struct pool_base *pool);
+};
+
+struct pool_base {
+	struct pool_ops ops;
+};
+
 struct pool {
+	struct pool_base base;
 	void **free_list;
 	unsigned int used;	/* how many chunks are currently in use */
 	unsigned int allocated;	/* how many chunks have been allocated */
@@ -22,7 +36,8 @@ struct pool {
 /* create a new pool which trunks in it have size bytes */
 struct pool *pool_create(size_t size);
 
-/* destroy the pool, if any trunk in use then failed and return itself or NULL on succeed*/
+/* destroy the pool, if any trunk in use then failed
+   and return itself or NULL on succeed */
 struct pool *pool_destroy(struct pool *pool);
 
 /* flush the pool, any unused trunks will be freed */

@@ -22,13 +22,14 @@ struct stream {
 		     readable:1,/* stream is readable*/
 		     writable:1;/* stream is writable*/
 	size_t rdbuf_size;	/* read buffer size */
-	struct pool *pool;	/* memory pool */
+	struct pool_base *pool;	/* memory pool */
 	struct event rev, wev;	/* read and write event */
 	struct list_head read_queue, write_queue; /* read and write queue */
 };
 
 /* init a stream */
-void stream_init(struct stream *stream, int type, size_t rdbuf_size, struct pool *pool);
+void stream_init(struct stream *stream, int type, size_t rdbuf_size,
+		 struct pool_base *pool);
 
 /* attach an fd to a stream */
 int stream_attach_fd(struct stream *stream, int fd);
