@@ -10,7 +10,7 @@
 #include <string.h>
 #include <errno.h>
 
-struct buffer *buffer_alloc(size_t bufsize, struct pool_base *pool)
+struct buffer *buffer_alloc(size_t bufsize, struct pool *pool)
 {
 	struct buffer *b;
 
@@ -42,8 +42,7 @@ struct buffer *buffer_alloc(size_t bufsize, struct pool_base *pool)
 	return b;
 }
 
-struct buffer *buffer_separate(struct buffer *b, size_t n,
-			       struct pool_base *pool)
+struct buffer *buffer_separate(struct buffer *b, size_t n, struct pool *pool)
 {
 	struct buffer *child;
 

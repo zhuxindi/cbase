@@ -16,18 +16,17 @@ struct buffer {
 	 *   |-----|-----|-----|
 	 */
 	char *head, *data, *tail, *end;	/* position pointers */
-	struct pool_base *pool;	/* relatived memory pool */
+	struct pool *pool;	/* relatived memory pool */
 	struct buffer *parent;	/* if separated from another buffer */
 	unsigned int refcnt;	/* ref counter */
 	struct list_head list;	/* join with other buffers into a chain */
 };
 
 /* allocate a buffer contains bufsize bytes at most */
-struct buffer *buffer_alloc(size_t bufsize, struct pool_base *pool);
+struct buffer *buffer_alloc(size_t bufsize, struct pool *pool);
 
 /* separate a buffer into two parts at postion n, return the tail part */
-struct buffer *buffer_separate(struct buffer *b, size_t n,
-			       struct pool_base *pool);
+struct buffer *buffer_separate(struct buffer *b, size_t n, struct pool *pool);
 
 /* free a single buffer */
 void buffer_free(struct buffer *b);

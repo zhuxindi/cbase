@@ -4,7 +4,7 @@
  * Date: 2014-04-22
  */
 
- #ifndef _CBASE_H
+#ifndef _CBASE_H
 #define _CBASE_H
 
 #include <utils.h>
@@ -15,6 +15,8 @@
 #include <event.h>
 #include <buffer.h>
 #include <pool.h>
+#include <trunklist.h>
 #include <stream.h>
+#include <strings.h>
 
 #endif /* _CBASE_H */
