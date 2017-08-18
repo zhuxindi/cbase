@@ -14,12 +14,14 @@ unsigned long current_msecs;
 
 void update_sys_time(void)
 {
-	pid = getpid();
-
-	current_time = time(NULL);
-	strftime(str_time, sizeof(str_time), "%F %T", localtime(&current_time));
+	if (pid == (pid_t)0)
+		pid = getpid();
 
 	gettimeofday(&time_of_day, NULL);
+
+	current_time  = time_of_day.tv_sec;
 	current_msecs = (unsigned long)time_of_day.tv_sec * 1000 +
 			(unsigned long)time_of_day.tv_usec / 1000;
+
+	strftime(str_time, sizeof(str_time), "%F %T", localtime(&current_time));
 }
