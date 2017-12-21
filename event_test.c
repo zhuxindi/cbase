@@ -22,6 +22,7 @@ void callback(void *p)
 
 int main()
 {
+	update_pid();
 	update_sys_time();
 	set_log_level(LOG_DEBUG);
 

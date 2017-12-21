@@ -43,13 +43,13 @@ FILE *set_log_file(FILE *f)
 {
 	if (log_file)
 		fflush(log_file);
-	return __set_log_file(f ?: stdout);
+	return __set_log_file(f ?: stderr);
 }
 
 void write_log(const char *file, int line, int level, const char *fmt, ...)
 {
 	if (!log_file)
-		__set_log_file(stdout);
+		__set_log_file(stderr);
 
 	if (level >= log_level) {
 		va_list va;

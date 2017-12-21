@@ -5,6 +5,7 @@
  */
 
 #include <stream.h>
+#include <buffer.h>
 #include <log.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +24,7 @@ static inline struct buffer *stream_get_rdbuf(struct stream *stream)
 	}
 
 	/* no free buffer in the queue then allocate a new one */
-	b = buffer_alloc(stream->rdbuf_size, stream->pool);
+	b = buffer_create(stream->rdbuf_size, stream->ops);
 	if (b)
 		list_add_tail(&b->list, &stream->read_queue);
 	return b;
@@ -100,7 +101,7 @@ static void stream_write_queue(struct stream *stream)
 
 		/* if no more data in the buffer than free it */
 		if (b->data == b->tail)
-			buffer_free(b);
+			buffer_release(b);
 	}
 
 	if (total)
@@ -134,19 +135,19 @@ static void stream_write_handler(struct stream *stream)
 }
 
 void stream_init(struct stream *stream, int type, size_t rdbuf_size,
-		 struct pool *pool)
+		 struct buffer_ops *ops)
 {
 	log_debug("init stream %p rdbuf_size %lu", stream, rdbuf_size);
 
 	/* set status */
 	stream->fd = -1;
 	stream->type = type;
-	stream->pool = pool;
 	stream->error = 0;
 	stream->closed = 0;
 	stream->readable = 0;
 	stream->writable = 0;
 	stream->rdbuf_size = rdbuf_size;
+	stream->ops = ops;
 
 	/* init read event */
 	memset(&stream->rev, 0, sizeof(stream->rev));
@@ -211,8 +212,8 @@ void stream_detach(struct stream *stream)
 		stream->writable = 0;
 
 		/* clear data in the two queues */
-		buffer_free_chain(&stream->read_queue);
-		buffer_free_chain(&stream->write_queue);
+		buffer_release_chain(&stream->read_queue);
+		buffer_release_chain(&stream->write_queue);
 	}
 }
 

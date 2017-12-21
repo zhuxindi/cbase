@@ -5,26 +5,26 @@
  */
 
 #include <pool.h>
-#include <trunklist.h>
 #include <log.h>
 #include <systime.h>
 
 int main()
 {
-	struct trunklist *pool;
+	struct pool *pool;
 	void *ptr;
 
+	update_pid();
 	update_sys_time();
 	set_log_level(LOG_DEBUG);
 
-	pool = trunklist_create(4);
+	pool = pool_create(4);
 
-	ptr = trunklist_alloc(pool);
+	ptr = pool_alloc(pool);
 
-	trunklist_destroy(pool);
+	pool_destroy(pool);
 
-	trunklist_free(pool, ptr);
+	pool_free(pool, ptr);
 
-	trunklist_destroy(pool);
+	pool_destroy(pool);
 	return 0;
 }

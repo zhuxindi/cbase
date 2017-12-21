@@ -15,7 +15,6 @@
 #include <event.h>
 #include <buffer.h>
 #include <pool.h>
-#include <trunklist.h>
 #include <stream.h>
 #include <strings.h>
 

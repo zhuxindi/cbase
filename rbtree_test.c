@@ -75,6 +75,7 @@ int main()
 	int i;
 	unsigned long key;
 
+	update_pid();
 	update_sys_time();
 	set_log_level(LOG_DEBUG);
 

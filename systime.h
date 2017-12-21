@@ -12,11 +12,13 @@
 #include <time.h>
 
 extern pid_t pid;
+
 extern time_t current_time;
 extern char str_time[];
 extern struct timeval time_of_day;
 extern unsigned long current_msecs;
 
 void update_sys_time(void);
+void update_pid(void);
 
 #endif /* _SYSTIME_H */

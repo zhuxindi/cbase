@@ -10,25 +10,30 @@
 #include <string.h>
 #include <errno.h>
 
-struct buffer *buffer_alloc(size_t bufsize, struct pool *pool)
+static void *buffer_alloc(size_t size, void *unused)
+{
+	return malloc(size);
+}
+
+static void buffer_free(void *ptr, void *unused)
+{
+	free(ptr);
+}
+
+struct buffer_ops buffer_ops = {
+	.alloc = buffer_alloc,
+	.free = buffer_free,
+};
+
+struct buffer *buffer_create(size_t bufsize, struct buffer_ops *ops)
 {
 	struct buffer *b;
 
 	/* allocate the structure's space and bufsize */
-	if (!pool) {
-		b = malloc(bufsize + sizeof(struct buffer));
-		if (!b) {
-			log_error("malloc() error: %s", strerror(errno));
-			return NULL;
-		}
-		b->pool = NULL;
-	} else {
-		b = pool->ops.alloc(pool, bufsize + sizeof(struct buffer));
-		if (!b) {
-			log_error("alloc buffer from pool %p failed", pool);
-			return NULL;
-		}
-		b->pool = pool;
+	b = ops->alloc(bufsize + sizeof(struct buffer), ops->user);
+	if (!b) {
+		log_error("alloc buffer space failed");
+		return NULL;
 	}
 
 	/* main buffer's parent set to itself */
@@ -36,13 +41,14 @@ struct buffer *buffer_alloc(size_t bufsize, struct pool *pool)
 	b->refcnt = 1;
 	b->head = b->data = b->tail = (char *)(b+1);
 	b->end = b->head + bufsize;
+	b->ops = ops;
 	INIT_LIST_HEAD(&b->list);
 
 	log_debug("alloc buffer %p size %lu", b, bufsize);
 	return b;
 }
 
-struct buffer *buffer_separate(struct buffer *b, size_t n, struct pool *pool)
+struct buffer *buffer_separate(struct buffer *b, size_t n)
 {
 	struct buffer *child;
 
@@ -56,26 +62,17 @@ struct buffer *buffer_separate(struct buffer *b, size_t n, struct pool *pool)
 	}
 
 	/* only allocate the structure's space */
-	if (!pool) {
-		child = malloc(sizeof(struct buffer));
-		if (!child) {
-			log_error("malloc() error: %s", strerror(errno));
-			return NULL;
-		}
-		child->pool = NULL;
-	} else {
-		child = pool->ops.alloc(pool, sizeof(struct buffer));
-		if (!child) {
-			log_error("alloc buffer from pool %p failed", pool);
-			return NULL;
-		}
-		child->pool = pool;
+	child = b->ops->alloc(sizeof(struct buffer), b->ops->user);
+	if (!child) {
+		log_error("alloc buffer space failed");
+		return NULL;
 	}
 
 	/* set to original parent, maybe b is a child too */
 	child->parent = b->parent;
 	child->parent->refcnt++;
 	child->refcnt = 1;
+	child->ops = b->ops;
 
 	/* adjust pointers */
 	child->data = b->data + n;
@@ -94,7 +91,7 @@ struct buffer *buffer_separate(struct buffer *b, size_t n, struct pool *pool)
 	return child;
 }
 
-static inline void __buffer_free(struct buffer *b)
+static inline void __buffer_release(struct buffer *b)
 {
 	/* unlink from chain */
 	list_del_init(&b->list);
@@ -102,18 +99,15 @@ static inline void __buffer_free(struct buffer *b)
 	/* have child buffer ? */
 	if (--b->refcnt == 0) {
 		log_debug("free buffer %p", b);
-		if (b->pool)
-			b->pool->ops.free(b->pool, b);
-		else
-			free(b);
+		b->ops->free(b, b->ops->user);
 	}
 }
 
-void buffer_free(struct buffer *b)
+void buffer_release(struct buffer *b)
 {
 	/* child buffer */
 	if (b->parent != b)
-		__buffer_free(b->parent);
+		__buffer_release(b->parent);
 
-	__buffer_free(b);
+	__buffer_release(b);
 }

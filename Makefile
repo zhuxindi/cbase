@@ -1,4 +1,4 @@
-CBASE_OBJ = stream.o buffer.o event.o rbtree.o trunklist.o pool.o log.o systime.o strings.o
+CBASE_OBJ = stream.o buffer.o event.o rbtree.o pool.o log.o systime.o strings.o
 CBASE_TEST = event_test buffer_test rbtree_test stream_test pool_test strings_test
 CBASE_STATIC = libcbase.a
 CBASE_DYNAMIC = libcbase.so
@@ -27,7 +27,7 @@ rbtree_test: rbtree_test.c rbtree.o log.o systime.o
 stream_test: stream_test.c stream.o buffer.o event.o log.o rbtree.o pool.o systime.o
 	gcc -o $@ $(CFLAGS) $^
 
-pool_test: pool_test.c trunklist.o pool.o log.o systime.o
+pool_test: pool_test.c pool.o log.o systime.o
 	gcc -o $@ $(CFLAGS) $^
 
 strings_test: strings_test.c strings.o
@@ -43,9 +43,6 @@ event.o: event.c event.h
 	gcc -o $@ -c $(CFLAGS) $<
 
 rbtree.o: rbtree.c rbtree.h
-	gcc -o $@ -c $(CFLAGS) $<
-
-trunklist.o: trunklist.c trunklist.h
 	gcc -o $@ -c $(CFLAGS) $<
 
 pool.o: pool.c pool.h

@@ -17,8 +17,10 @@ enum {
 	LOG_DIE,
 };
 
+/* set log level and return the old level, default level is LOG_WARN */
 int set_log_level(int min_level);
 
+/* set log file and return the old file, default file is stderr */
 FILE *set_log_file(FILE *f);
 
 void write_log(const char *file, int line, int level, const char *fmt, ...);
