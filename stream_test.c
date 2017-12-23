@@ -16,25 +16,10 @@ static inline void set_nonblock(int fd)
 	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 }
 
-static void *my_alloc(size_t n, void *user)
-{
-	struct pool *pool = user;
-
-	if (pool_size(pool) < n)
-		return NULL;
-
-	return pool_alloc(pool);
-}
-
-static void my_free(void *ptr, void *user)
-{
-	pool_free((struct pool *)user, ptr);
-}
-
 int main()
 {
 	struct pool *pool;
-	struct buffer_ops ops;
+	struct memops ops;
 	struct stream rstream, wstream;
 	struct list_head buf = LIST_HEAD_INIT(buf);
 	const size_t rdbuf_len = 32;
@@ -48,9 +33,7 @@ int main()
 	if (!pool)
 		return 1;
 
-	ops.alloc = my_alloc;
-	ops.free = my_free;
-	ops.user = pool;
+	pool_set_memops(pool, &ops);
 
 	stream_init(&rstream, STREAM_T_RD, rdbuf_len, &ops);
 	set_nonblock(0);

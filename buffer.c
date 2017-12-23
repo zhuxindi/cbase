@@ -10,22 +10,7 @@
 #include <string.h>
 #include <errno.h>
 
-static void *buffer_alloc(size_t size, void *unused)
-{
-	return malloc(size);
-}
-
-static void buffer_free(void *ptr, void *unused)
-{
-	free(ptr);
-}
-
-struct buffer_ops buffer_ops = {
-	.alloc = buffer_alloc,
-	.free = buffer_free,
-};
-
-struct buffer *buffer_create(size_t bufsize, struct buffer_ops *ops)
+struct buffer *buffer_create(size_t bufsize, struct memops *ops)
 {
 	struct buffer *b;
 

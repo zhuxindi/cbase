@@ -135,7 +135,7 @@ static void stream_write_handler(struct stream *stream)
 }
 
 void stream_init(struct stream *stream, int type, size_t rdbuf_size,
-		 struct buffer_ops *ops)
+		 struct memops *ops)
 {
 	log_debug("init stream %p rdbuf_size %lu", stream, rdbuf_size);
 

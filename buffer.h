@@ -7,16 +7,9 @@
 #ifndef _BUFFER_H
 #define _BUFFER_H
 
+#include <utils.h>
 #include <list.h>
 #include <stdlib.h>
-
-struct buffer_ops {
-	void *(*alloc)(size_t, void *);
-	void (*free)(void *, void *);
-	void *user;
-};
-
-extern struct buffer_ops buffer_ops;
 
 struct buffer {
 	/* head  data  tail   end
@@ -26,13 +19,13 @@ struct buffer {
 	struct buffer *parent;	/* if separated from another buffer */
 	unsigned int refcnt;	/* ref counter */
 	struct list_head list;	/* join with other buffers into a chain */
-	struct buffer_ops *ops;
+	struct memops *ops;
 };
 
 #define BUFFER_HEADER_SIZE sizeof(struct buffer)
 
 /* allocate a buffer contains bufsize bytes at most */
-struct buffer *buffer_create(size_t bufsize, struct buffer_ops *ops);
+struct buffer *buffer_create(size_t bufsize, struct memops *ops);
 
 /* separate a buffer into two parts at postion n, return the tail part */
 struct buffer *buffer_separate(struct buffer *b, size_t n);

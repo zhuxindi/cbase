@@ -7,6 +7,7 @@
 #ifndef _POOL_H
 #define _POOL_H
 
+#include <utils.h>
 #include <list.h>
 
 struct pool {
@@ -42,5 +43,7 @@ static inline size_t pool_size(const struct pool *pool)
 {
 	return pool->size;
 }
+
+void pool_set_memops(struct pool *pool, struct memops *ops);
 
 #endif /* _POOL_H */

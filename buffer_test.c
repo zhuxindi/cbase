@@ -41,7 +41,7 @@ void print_buffer(struct buffer *b)
 
 int main()
 {
-	struct buffer_ops ops = { my_malloc, my_free, NULL };
+	struct memops ops = { my_malloc, my_free, NULL };
 	struct list_head head = LIST_HEAD_INIT(head);
 	struct buffer *b, *b1, *b2;
 	int i;

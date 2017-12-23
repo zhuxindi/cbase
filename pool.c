@@ -132,3 +132,25 @@ struct pool *pool_create(size_t size)
 	log_debug("create pool %p size %lu", pool, size);
 	return pool;
 }
+
+static void *pool_alloc_trunk(size_t size, void *pool)
+{
+	if (pool_size(pool) < size) {
+		log_error("pool %p too small to alloc %lu bytes", pool, size);
+		return NULL;
+	}
+
+	return pool_alloc(pool);
+}
+
+static void pool_free_trunk(void *ptr, void *pool)
+{
+	pool_free(pool, ptr);
+}
+
+void pool_set_memops(struct pool *pool, struct memops *ops)
+{
+	ops->alloc = pool_alloc_trunk;
+	ops->free = pool_free_trunk;
+	ops->user = pool;
+}
