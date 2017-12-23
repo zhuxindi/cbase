@@ -30,24 +30,28 @@ void pool_flush(struct pool *pool)
 	pool->free_list = next;
 }
 
-struct pool *pool_destroy(struct pool *pool)
+static inline void pool_release(struct pool *pool)
 {
-	if (pool) {
+	if (--pool->refcnt == 0) {
 		/* free all unused trunks */
 		pool_flush(pool);
 
-		/* pool has trunks in use */
-		if (pool->used) {
-			log_warn("pool %p is still in use, can't be destroyed", pool);
-			return pool;
-		}
-
 		log_debug("destroy pool %p", pool);
-
-		list_del(&pool->list);
 		free(pool);
 	}
-	return NULL;
+}
+
+struct pool *pool_destroy(struct pool *pool)
+{
+	struct pool *retpool = NULL;
+	if (pool->refcnt > 1) {
+		log_debug("pool %p is still in use", pool);
+		retpool = pool;
+	}
+
+	list_del(&pool->list);
+	pool_release(pool);
+	return retpool;
 }
 
 void pool_flush_all(void)
@@ -81,7 +85,7 @@ static inline void *__pool_alloc(struct pool *pool)
 	}
 
 	pool->allocated++;
-	pool->used++;
+	pool->refcnt++;
 	log_debug("alloc trunk %p @pool %p", ptr, pool);
 	return ptr;
 }
@@ -95,7 +99,7 @@ void *pool_alloc(struct pool *pool)
 
 	/* reuse a trunk allocated before */
 	pool->free_list = *(void **)pool->free_list;
-	pool->used++;
+	pool->refcnt++;
 	log_debug("reuse trunk %p @pool %p", ptr, pool);
 	return ptr;
 }
@@ -107,7 +111,7 @@ void pool_free(struct pool *pool, void *ptr)
 		log_debug("recycle trunk %p @pool %p", ptr, pool);
 		*(void **)ptr = (void *)pool->free_list;
 		pool->free_list = (void *)ptr;
-		pool->used--;
+		pool_release(pool);
 	}
 }
 
@@ -127,6 +131,7 @@ struct pool *pool_create(size_t size)
 	 * so we need to adjust the size up to a multiple of align
 	 */
 	pool->size = ((size + align - 1) & -align);
+	pool->refcnt = 1;
 	list_add_tail(&pool->list, &pools);
 
 	log_debug("create pool %p size %lu", pool, size);

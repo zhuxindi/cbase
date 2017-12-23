@@ -24,7 +24,5 @@ int main()
 	pool_destroy(pool);
 
 	pool_free(pool, ptr);
-
-	pool_destroy(pool);
 	return 0;
 }

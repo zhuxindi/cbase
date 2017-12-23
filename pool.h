@@ -12,7 +12,7 @@
 
 struct pool {
 	void **free_list;
-	unsigned int used;	/* how many chunks are currently in use */
+	unsigned int refcnt;	/* reference count */
 	unsigned int allocated;	/* how many chunks have been allocated */
 	unsigned int limit;	/* hard limit on the number of chunks */
 	size_t size;		/* chunk size */
@@ -22,8 +22,8 @@ struct pool {
 /* create a new pool which trunks in it have size bytes */
 struct pool *pool_create(size_t size);
 
-/* destroy the pool, if any trunk in use then failed
-   and return itself or NULL on succeed */
+/* if no trunk in use then destroy the pool right away and return NULL,
+   or return the pool and destroy it after last trunk freed */
 struct pool *pool_destroy(struct pool *pool);
 
 /* flush the pool, any unused trunks will be freed */
