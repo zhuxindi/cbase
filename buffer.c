@@ -37,9 +37,6 @@ struct buffer *buffer_separate(struct buffer *b, size_t n)
 {
 	struct buffer *child;
 
-	if (n == 0)
-		return b;
-
 	if (n >= (size_t)(b->tail - b->data)) {
 		log_error("%lu is out of buffer %p size %lu",
 			  n, b, b->tail - b->data);
