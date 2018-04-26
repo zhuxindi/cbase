@@ -7,7 +7,7 @@
 #ifndef _BUFFER_H
 #define _BUFFER_H
 
-#include <utils.h>
+#include <pool.h>
 #include <list.h>
 #include <stdlib.h>
 
@@ -19,13 +19,13 @@ struct buffer {
 	struct buffer *parent;	/* if separated from another buffer */
 	unsigned int refcnt;	/* ref counter */
 	struct list_head list;	/* join with other buffers into a chain */
-	struct memops *ops;
+	struct pool *pool;
 };
 
-#define BUFFER_HEADER_SIZE sizeof(struct buffer)
+#define BUFFER_POOL_SIZE(bufsize) ((bufsize) + sizeof(struct buffer))
 
 /* allocate a buffer contains bufsize bytes at most */
-struct buffer *buffer_create(size_t bufsize, struct memops *ops);
+struct buffer *buffer_create(size_t bufsize, struct pool *pool);
 
 /* separate a buffer into two parts at postion n, return the tail part */
 struct buffer *buffer_separate(struct buffer *b, size_t n);

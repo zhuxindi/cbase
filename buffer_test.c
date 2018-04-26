@@ -10,38 +10,15 @@
 #include <stdio.h>
 #include <string.h>
 
-static void *my_malloc(size_t n, void *unused)
+static inline void print_buffer(struct buffer *b)
 {
-	void *ptr = malloc(n);
-
-	if (ptr)
-		log_info("malloc(%lu): %p", n, ptr);
-	else
-		log_info("malloc(%lu) failed", n);
-	return ptr;
-}
-
-static void my_free(void *ptr, void *unused)
-{
-	if (ptr) {
-		log_info("free(%p)", ptr);
-		free(ptr);
-	}
-}
-
-void print_buffer(struct buffer *b)
-{
-	char *s;
-
-	s = strndup(b->data, b->tail - b->data);
-	log_info("%p datalen %ld freelen %ld data '%s'", b,
-		 b->tail - b->data, b->end - b->tail, s);
-	free(s);
+	log_info("buffer %p datalen %ld freelen %ld data '%.*s'", b,
+		 b->tail - b->data, b->end - b->tail, b->tail - b->data, b->data);
 }
 
 int main()
 {
-	struct memops ops = { my_malloc, my_free, NULL };
+	struct pool *pool;
 	struct list_head head = LIST_HEAD_INIT(head);
 	struct buffer *b, *b1, *b2;
 	int i;
@@ -50,13 +27,21 @@ int main()
 	update_sys_time();
 	set_log_level(LOG_DEBUG);
 
-	b = buffer_create(20, &ops);
+	pool = pool_create(BUFFER_POOL_SIZE(20));
+	if (!pool)
+		return 1;
+
+	b = buffer_create(20, pool);
 	if (!b)
 		return 1;
 	list_add_tail(&b->list, &head);
+	print_buffer(b);
 
-	for (i = 0; i < 16; i++)
-		memcpy(b->tail++, "a", 1);
+	for (i = 0; i < 16; i++) {
+		char c = 'a' + i;
+		memcpy(b->tail++, &c, 1);
+		log_info("append %c to buffer %p", c, b);
+	}
 	print_buffer(b);
 
 	b1 = buffer_separate(b, 10);
@@ -71,10 +56,14 @@ int main()
 	print_buffer(b1);
 	print_buffer(b2);
 
-	for (i = 0; b2->end > b2->tail; i++)
-		memcpy(b2->tail++, "b", 1);
+	for (i = 0; b2->end > b2->tail; i++) {
+		char c = 'A' + i;
+		memcpy(b2->tail++, &c, 1);
+		log_info("append %c to buffer %p", c, b);
+	}
 	print_buffer(b2);
 
 	buffer_release_chain(&head);
+	pool_destroy(pool);
 	return 0;
 }

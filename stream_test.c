@@ -19,7 +19,6 @@ static inline void set_nonblock(int fd)
 int main()
 {
 	struct pool *pool;
-	struct memops ops;
 	struct stream rstream, wstream;
 	struct list_head buf = LIST_HEAD_INIT(buf);
 	const size_t rdbuf_len = 32;
@@ -29,20 +28,18 @@ int main()
 	set_log_level(LOG_DEBUG);
 	event_init(10);
 
-	pool = pool_create(rdbuf_len + BUFFER_HEADER_SIZE);
+	pool = pool_create(BUFFER_POOL_SIZE(rdbuf_len));
 	if (!pool)
 		return 1;
 
-	pool_set_memops(pool, &ops);
-
-	stream_init(&rstream, STREAM_T_RD, rdbuf_len, &ops);
+	stream_init(&rstream, STREAM_T_RD, rdbuf_len, pool);
 	set_nonblock(0);
 	stream_attach_fd(&rstream, 0);
 	event_wait();
 	stream_read(&rstream, &buf);
 	stream_detach(&rstream);
 
-	stream_init(&wstream, STREAM_T_WR, 0, &ops);
+	stream_init(&wstream, STREAM_T_WR, 0, pool);
 	set_nonblock(1);
 	stream_attach_fd(&wstream, 1);
 	event_wait();

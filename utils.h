@@ -9,24 +9,6 @@
 
 #include <stddef.h>
 
-struct memops {
-	void *(*alloc)(size_t, void *);
-	void (*free)(void *, void *);
-	void *user;
-};
-
-extern struct memops memops;
-
-static inline void *mem_alloc(struct memops *ops, size_t size)
-{
-	return ops->alloc(size, ops->user);
-}
-
-static inline void mem_free(struct memops *ops, void *ptr)
-{
-	ops->free(ptr, ops->user);
-}
-
 #define container_of(ptr, type, member) ({			\
 	const typeof(((type *)0)->member) *__ptr = (ptr);	\
 	(type *)((char *)__ptr - offsetof(type, member));	\

@@ -24,7 +24,7 @@ static inline struct buffer *stream_get_rdbuf(struct stream *stream)
 	}
 
 	/* no free buffer in the queue then allocate a new one */
-	b = buffer_create(stream->rdbuf_size, stream->ops);
+	b = buffer_create(stream->rdbuf_size, stream->pool);
 	if (b)
 		list_add_tail(&b->list, &stream->read_queue);
 	return b;
@@ -135,7 +135,7 @@ static void stream_write_handler(struct stream *stream)
 }
 
 void stream_init(struct stream *stream, int type, size_t rdbuf_size,
-		 struct memops *ops)
+		 struct pool *pool)
 {
 	log_debug("init stream %p rdbuf_size %lu", stream, rdbuf_size);
 
@@ -147,7 +147,7 @@ void stream_init(struct stream *stream, int type, size_t rdbuf_size,
 	stream->readable = 0;
 	stream->writable = 0;
 	stream->rdbuf_size = rdbuf_size;
-	stream->ops = ops;
+	stream->pool = pool;
 
 	/* init read event */
 	memset(&stream->rev, 0, sizeof(stream->rev));

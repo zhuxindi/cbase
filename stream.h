@@ -24,12 +24,12 @@ struct stream {
 	size_t rdbuf_size;	/* read buffer size */
 	struct event rev, wev;	/* read and write event */
 	struct list_head read_queue, write_queue; /* read and write queue */
-	struct memops *ops;
+	struct pool *pool;
 };
 
 /* init a stream */
 void stream_init(struct stream *stream, int type, size_t rdbuf_size,
-		 struct memops *ops);
+		 struct pool *pool);
 
 /* attach an fd to a stream */
 int stream_attach_fd(struct stream *stream, int fd);
