@@ -124,7 +124,7 @@ static void stream_read_handler(struct stream *stream)
 static void stream_write_handler(struct stream *stream)
 {
 	/* check stream status */
-	if (stream->error || stream->closed)
+	if (stream->error)
 		return;
 
 	log_debug("stream %p is writable", stream);
@@ -220,9 +220,8 @@ void stream_detach(struct stream *stream)
 int stream_write(struct stream *stream, struct list_head *head)
 {
 	/* check stream status */
-	if (stream->error || stream->closed) {
-		if (stream->error)
-			log_error("stream %p has error", stream);
+	if (stream->error) {
+		log_error("stream %p has error", stream);
 		return -1;
 	}
 
