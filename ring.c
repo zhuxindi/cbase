@@ -20,8 +20,8 @@ struct ring *ring_create(struct ring *ring, size_t size)
 	ring->read = ring->write = ring->begin = buf;
 	ring->end = buf + size;
 
-	log_debug("create ring %p size=%lu begin/read/write=%p end=%p",
-		  ring, size, ring->begin, ring->end);
+	log_debug("create ring %p size=%lu begin=read=write=%p",
+		  ring, size, ring->begin);
 	return ring;
 }
 

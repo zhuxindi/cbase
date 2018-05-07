@@ -18,7 +18,6 @@ struct stream {
 	int fd;			/* attached fd */
 	int type;		/* STREAM_T_XXX */
 	unsigned int error:1,	/* stream has errors */
-		     closed:1,	/* stream is closed */
 		     readable:1,/* stream is readable*/
 		     writable:1;/* stream is writable*/
 	size_t rdbuf_size;	/* read buffer size */

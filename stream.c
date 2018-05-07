@@ -58,7 +58,7 @@ static void stream_read_queue(struct stream *stream)
 		/* got eof */
 		} else if (rc == 0) {
 			log_debug("stream %p read eof", stream);
-			stream->closed = 1;
+			stream->readable = 0;
 			break;
 		}
 
@@ -111,7 +111,7 @@ static void stream_write_queue(struct stream *stream)
 static void stream_read_handler(struct stream *stream)
 {
 	/* check stream status */
-	if (stream->error || stream->closed)
+	if (stream->error)
 		return;
 
 	log_debug("stream %p is readable", stream);
@@ -143,7 +143,6 @@ void stream_init(struct stream *stream, int type, size_t rdbuf_size,
 	stream->fd = -1;
 	stream->type = type;
 	stream->error = 0;
-	stream->closed = 0;
 	stream->readable = 0;
 	stream->writable = 0;
 	stream->rdbuf_size = rdbuf_size;
@@ -207,7 +206,6 @@ void stream_detach(struct stream *stream)
 
 		/* clear status */
 		stream->error = 0;
-		stream->closed = 0;
 		stream->readable = 0;
 		stream->writable = 0;
 
@@ -237,9 +235,8 @@ int stream_write(struct stream *stream, struct list_head *head)
 int stream_read(struct stream *stream, struct list_head *head)
 {
 	/* check stream status */
-	if (stream->error || stream->closed) {
-		if (stream->error)
-			log_error("stream %p has error", stream);
+	if (stream->error) {
+		log_error("stream %p has error", stream);
 		return -1;
 	}
 
