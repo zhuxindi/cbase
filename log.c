@@ -7,6 +7,7 @@
 #include <log.h>
 #include <systime.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
 
 static FILE *log_file;
@@ -62,6 +63,6 @@ void write_log(const char *file, int line, int level, const char *fmt, ...)
 
 	if (level == LOG_DIE) {
 		fflush(log_file);
-		_exit(1);
+		exit(1);
 	}
 }

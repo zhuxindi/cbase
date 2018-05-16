@@ -80,9 +80,6 @@ struct buffer *buffer_separate(struct buffer *b, size_t n)
 
 static inline void __buffer_release(struct buffer *b)
 {
-	/* unlink from chain */
-	list_del_init(&b->list);
-
 	/* have child buffer ? */
 	if (--b->refcnt == 0) {
 		log_debug("free buffer %p", b);
@@ -92,9 +89,11 @@ static inline void __buffer_release(struct buffer *b)
 
 void buffer_release(struct buffer *b)
 {
+	/* unlink from chain */
+	list_del(&b->list);
+
 	/* child buffer */
 	if (b->parent != b)
 		__buffer_release(b->parent);
-
 	__buffer_release(b);
 }

@@ -77,7 +77,7 @@ static inline void __event_del_timer(struct event *ev)
 	rb_erase(&ev->node, &timer_rbtree);
 }
 
-int event_process_timer(int limit)
+static int event_process_timer(int limit)
 {
 	int n;
 
@@ -96,7 +96,7 @@ int event_process_timer(int limit)
 	return n;
 }
 
-int event_process_io(int limit)
+static int event_process_io(int limit)
 {
 	int n;
 
