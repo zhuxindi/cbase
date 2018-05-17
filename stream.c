@@ -46,17 +46,17 @@ static void stream_read_queue(struct stream *stream)
 		/* read data from fd */
 		rc = read(stream->fd, b->tail, b->end - b->tail);
 		if (rc == -1) {
-			/* error occured */
-			if (errno != EWOULDBLOCK) {
+			if (errno == EWOULDBLOCK || errno == EAGAIN) /* no more data */
+				stream->readable = 0;
+
+			else if (errno != EINTR) { /* error occured */
 				log_error("read() error: %s", strerror(errno));
 				stream->error = 1;
-			/* no more data */
-			} else
-				stream->readable = 0;
+			}
+
 			break;
 
-		/* got eof */
-		} else if (rc == 0) {
+		} else if (rc == 0) { /* got eof */
 			log_debug("stream %p read eof", stream);
 			stream->readable = 0;
 			break;
@@ -83,14 +83,15 @@ static void stream_write_queue(struct stream *stream)
 			/* write data to fd */
 			rc = write(stream->fd, b->data, b->tail - b->data);
 			if (rc == -1) {
-				/* error occured */
-				if (errno != EWOULDBLOCK) {
+				if (errno == EWOULDBLOCK || errno == EAGAIN) /* no more data */
+					stream->writable = 0;
+
+				else if (errno != EINTR) { /* error occured */
 					log_error("write() error: %s",
 						  strerror(errno));
 					stream->error = 1;
-				/* no more data */
-				} else
-					stream->writable = 0;
+				}
+
 				break;
 			}
 
