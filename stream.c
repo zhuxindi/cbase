@@ -59,6 +59,7 @@ static void stream_read_queue(struct stream *stream)
 		} else if (rc == 0) { /* got eof */
 			log_debug("stream %p read eof", stream);
 			stream->readable = 0;
+			stream->eof = 1;
 			break;
 		}
 
@@ -146,6 +147,7 @@ void stream_init(struct stream *stream, int type, size_t rdbuf_size,
 	stream->error = 0;
 	stream->readable = 0;
 	stream->writable = 0;
+	stream->eof = 0;
 	stream->rdbuf_size = rdbuf_size;
 	stream->pool = pool;
 
@@ -209,6 +211,7 @@ void stream_detach(struct stream *stream)
 		stream->error = 0;
 		stream->readable = 0;
 		stream->writable = 0;
+		stream->eof = 0;
 
 		/* clear data in the two queues */
 		buffer_release_chain(&stream->read_queue);

@@ -19,7 +19,8 @@ struct stream {
 	int type;		/* STREAM_T_XXX */
 	unsigned int error:1,	/* stream has errors */
 		     readable:1,/* stream is readable*/
-		     writable:1;/* stream is writable*/
+		     writable:1,/* stream is writable*/
+		     eof:1;	/* stream is closed */
 	size_t rdbuf_size;	/* read buffer size */
 	struct event rev, wev;	/* read and write event */
 	struct list_head read_queue, write_queue; /* read and write queue */
@@ -41,5 +42,11 @@ int stream_write(struct stream *stream, struct list_head *head);
 
 /* read buffer from a stream */
 int stream_read(struct stream *stream, struct list_head *head);
+
+/* has a stream read eof */
+static inline int stream_eof(struct stream *stream)
+{
+	return stream->eof;
+}
 
 #endif /* _STREAM_H */
