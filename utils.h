@@ -14,23 +14,25 @@
 
 #define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
 
+#define ALIGN(x, a)	(((x) + ((typeof(x))(a)-1)) & ~((typeof(x))(a)-1))
+
 #define container_of(ptr, type, member) ({			\
 	const typeof(((type *)0)->member) *__ptr = (ptr);	\
 	(type *)((char *)__ptr - offsetof(type, member));	\
 })
 
-#define min(x, y) ({						\
-	typeof(x) __x = (x);					\
-	typeof(y) __y = (y);					\
-	(void) (&__x == &__y);					\
-	__x < __y ? __x : __y;					\
+#define min(x, y) ({		\
+	typeof(x) __x = (x);	\
+	typeof(y) __y = (y);	\
+	(void) (&__x == &__y);	\
+	__x < __y ? __x : __y;	\
 })
 
-#define max(x, y) ({						\
-	typeof(x) __x = (x);					\
-	typeof(y) __y = (y);					\
-	(void) (&__x == &__y);					\
-	__x > __y ? __x : __y;					\
+#define max(x, y) ({		\
+	typeof(x) __x = (x);	\
+	typeof(y) __y = (y);	\
+	(void) (&__x == &__y);	\
+	__x > __y ? __x : __y;	\
 })
 
 #endif /* _UTILS_H */
