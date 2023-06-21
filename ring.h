@@ -23,9 +23,9 @@ struct ring {
 	.write = b,			\
 }
 
-#define DEFINE_RING(name, size)		\
-	char ringbuf##name[size];	\
-	struct ring name = RING_INITIALIZER(ringbuf##name, size)
+#define DEFINE_RING(name, s)		\
+	char ringbuf##name[s];		\
+	struct ring name = RING_INITIALIZER(ringbuf##name, s)
 
 /* initialize a ring that use buf and can contain at most size bytes */
 static inline void ring_init(struct ring *ring, char *buf, size_t size)
@@ -58,7 +58,7 @@ static inline size_t ring_used(const struct ring *ring)
 	if (ring->read <= ring->write)
 		return ring->write - ring->read;
 	else
-		return (ring->end - ring->read) + (ring->write - ring->begin);
+		return ring_size(ring) - (ring->read - ring->write);
 }
 
 /* get the usable size of the ring */

@@ -3,7 +3,7 @@ CBASE_TEST = event_test buffer_test rbtree_test stream_test pool_test xstrings_t
 CBASE_STATIC = libcbase.a
 CBASE_DYNAMIC = libcbase.so
 
-CFLAGS = -D_GNU_SOURCE -fPIC -pipe -O0 -W -Wall -Wpointer-arith -Wno-unused-parameter -g -I.
+CFLAGS = -std=gnu99 -D_GNU_SOURCE -fPIC -pipe -O2 -W -Wall -Wpointer-arith -Wno-unused-parameter -g -I.
 
 all: $(CBASE_STATIC) $(CBASE_DYNAMIC) test
 

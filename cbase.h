@@ -16,6 +16,7 @@
 #include <buffer.h>
 #include <pool.h>
 #include <stream.h>
-#include <strings.h>
+#include <xstrings.h>
+#include <ring.h>
 
 #endif /* _CBASE_H */
