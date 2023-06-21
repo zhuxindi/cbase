@@ -4,10 +4,10 @@
  * Date: 2017-06-19
  */
 
-#ifndef _STRINGS_H
-#define _STRINGS_H
+#ifndef _XSTRINGS_H
+#define _XSTRINGS_H
 
-#include <stdlib.h>
+#include <string.h>
 
 char *strtrim(char *s);
 
@@ -25,4 +25,4 @@ char *strstrn(const char *s1, const char *s2, size_t n);
 char *strncasestr(const char *s1, const char *s2, size_t n);
 char *strcasestrn(const char *s1, const char *s2, size_t n);
 
-#endif /* _STRINGS_H */
+#endif /* _XSTRINGS_H */

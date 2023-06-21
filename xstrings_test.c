@@ -4,8 +4,7 @@
  * Date: 2017-06-19
  */
 
-#include <strings.h>
-#include <string.h>
+#include <xstrings.h>
 #include <stdio.h>
 
 int main()

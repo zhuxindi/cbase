@@ -1,11 +1,10 @@
 /**
- * File: strings.c
+ * File: xstrings.c
  * Author: ZhuXindi
  * Date: 2017-06-19
  */
 
-#include <strings.h>
-#include <string.h>
+#include <xstrings.h>
 #include <ctype.h>
 
 char *strtrim(char *s)
