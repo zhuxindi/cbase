@@ -8,18 +8,16 @@
 #include <log.h>
 #include <string.h>
 
-struct ring *ring_create(struct ring *ring, size_t size)
+struct ring *ring_create(size_t size)
 {
-	char *buf = malloc(size);
+	struct ring *ring = malloc(sizeof(struct ring) + size);
 
-	if (!buf) {
+	if (!ring) {
 		log_error("alloc ring space failed");
 		return NULL;
 	}
-
-	ring->read = ring->write = ring->begin = buf;
-	ring->end = buf + size;
-
+	
+	ring_init(ring, (char *)(ring + 1), size);
 	log_debug("create ring %p size=%lu begin=read=write=%p",
 		  ring, size, ring->begin);
 	return ring;
@@ -28,7 +26,7 @@ struct ring *ring_create(struct ring *ring, size_t size)
 void ring_destroy(struct ring *ring)
 {
 	log_debug("destroy ring %p", ring);
-	free(ring->begin);
+	free(ring);
 }
 
 static inline void ring_push_data(struct ring *ring, char *dst,

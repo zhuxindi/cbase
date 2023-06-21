@@ -16,8 +16,26 @@ struct ring {
 	char *write;	/* next write position */
 };
 
+#define RING_INITIALIZER(b, s) {	\
+	.begin = b,			\
+	.end = b + s,			\
+	.read = b,			\
+	.write = b,			\
+}
+
+#define DEFINE_RING(name, size)		\
+	char ringbuf##name[size];	\
+	struct ring name = RING_INITIALIZER(ringbuf##name, size)
+
+/* initialize a ring that use buf and can contain at most size bytes */
+static inline void ring_init(struct ring *ring, char *buf, size_t size)
+{
+	ring->read = ring->write = ring->begin = buf;
+	ring->end = buf + size;
+}
+
 /* create a ring that can contain at most size bytes */
-struct ring *ring_create(struct ring *ring, size_t size);
+struct ring *ring_create(size_t size);
 
 /* destroy a ring */
 void ring_destroy(struct ring *ring);
