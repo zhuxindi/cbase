@@ -9,55 +9,66 @@
 
 int main()
 {
-	char s[] = " Hello World! ";
-	char *p;
+	const char s[] = " Hello World! ";
+	char buf[100], buf2[100];
+	int n, m;
 
-	printf("original: %s\n", strtrim(s));
+	printf("origin: \"%s\"\n", s);
 
-	printf("strtoupper(): %s\n", strtoupper(s));
-	strcpy(s, "Hello World!");
+	strcpy(buf, s);
+	*strtrim(buf) = 0;
+	printf("strtrim(): \"%s\"\n", buf);
 
-	printf("strtolower(): %s\n", strtolower(s));
-	strcpy(s, "Hello World!");
+	strcpy(buf, s);
+	*strtoupper(buf) = 0;
+	printf("strtoupper(): \"%s\"\n", buf);
 
-	printf("strntoupper(5): %s\n", strntoupper(s,5));
-	strcpy(s, "Hello World!");
+	strcpy(buf, s);
+	*strtolower(buf) = 0;
+	printf("strtolower(): \"%s\"\n", buf);
 
-	printf("strntolower(5): %s\n", strntolower(s,5));
-	strcpy(s, "Hello World!");
+	strcpy(buf, s);
+	*strntoupper(buf,6) = 0;
+	printf("strntoupper(6): \"%s\"\n", buf);
 
-	p = strcasechr(s, 'o');
-	printf("strcasechr('o'): %s\n", p);
+	strcpy(buf, s);
+	*strntolower(buf,6) = 0;
+	printf("strntolower(6): \"%s\"\n", buf);
 
-	p = strnchr(s, 'o', 5);
-	printf("strcasechr('o', 5): %s\n", p);
+	printf("strcasechr('O'): \"%s\"\n", strcasechr(s, 'O'));
 
-	p = strnchr(s, 'o', 3);
-	printf("strcasechr('o', 3): %s\n", p);
+	printf("strnchr('o', 6): \"%s\"\n", strnchr(s, 'o', 6));
+	printf("strnchr('o', 3): \"%s\"\n", strnchr(s, 'o', 3));
 
-	p = strncasechr(s, 'O', 5);
-	printf("strcasechr('O', 5): %s\n", p);
+	printf("strncasechr('O', 6): \"%s\"\n", strncasechr(s, 'O', 6));
+	printf("strncasechr('O', 3): \"%s\"\n", strncasechr(s, 'O', 3));
 
-	p = strncasechr(s, 'O', 3);
-	printf("strcasechr('O', 3): %s\n", p);
+	printf("strnstr('o', 6): \"%s\"\n", strnstr(s, "o", 6));
+	printf("strnstr('o', 3): \"%s\"\n", strnstr(s, "o", 3));
 
-	p = strnstr(s, "o", 5);
-	printf("strnstr('o', 5): %s\n", p);
+	printf("strncasestr(\"O\", 6): \"%s\"\n", strncasestr(s, "O", 6));
+	printf("strncasestr(\"O\", 3): \"%s\"\n", strncasestr(s, "O", 3));
 
-	p = strnstr(s, "o", 3);
-	printf("strnstr('o', 3): %s\n", p);
+	printf("strstrn(\"ok\", 1): \"%s\"\n", strstrn(s, "ok", 1));
+	printf("strcasestrn(\"OK\", 1): \"%s\"\n", strcasestrn(s, "OK", 1));
 
-	p = strncasestr(s, "O", 5);
-	printf("strncasestr(\"O\", 5): %s\n", p);
+	*hexdump(buf, s, strlen(s)) = 0;
+	printf("hexdump(): \"%s\"\n", buf);
 
-	p = strncasestr(s, "O", 3);
-	printf("strncasestr(\"O\", 3): %s\n", p);
+	n = base64_encoded_len(strlen(s));
+	printf("base64_encoded_len(%d): %d\n", (int)strlen(s), n);
+	m = base64_decoded_len(n);
+	printf("base64_decoded_len(%d): %d\n", n, m);
 
-	p = strstrn(s, "ok", 1);
-	printf("strstrn(\"ok\", 1): %s\n", p);
+	n = base64_encode(buf, s, strlen(s)) - buf;
+	printf("base64_encode(): \"%.*s\"\n", n, buf);
+	m = base64_decode(buf2, buf, n) - buf2;
+	printf("base64_decode(): \"%.*s\"\n", m, buf2);
 
-	p = strcasestrn(s, "OK", 1);
-	printf("strcasestrn(\"OK\", 1): %s\n", p);
+	n = base64_encode_url(buf, s, strlen(s)) - buf;
+	printf("base64_encode_url(): \"%.*s\"\n", n, buf);
+	m = base64_decode_url(buf2, buf, n) - buf2;
+	printf("base64_decode_url(): \"%.*s\"\n", m, buf2);
 
 	return 0;
 }

@@ -60,7 +60,7 @@ log.o: log.c log.h
 systime.o: systime.c systime.h
 	gcc -o $@ -c $(CFLAGS) $<
 
-strings.o: strings.c strings.h
+xstrings.o: xstrings.c xstrings.h
 	gcc -o $@ -c $(CFLAGS) $<
 
 ring.o: ring.c ring.h
