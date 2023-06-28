@@ -47,6 +47,35 @@ FILE *set_log_file(FILE *f)
 	return __set_log_file(f ?: stderr);
 }
 
+static void colour_begin(int level)
+{
+	if (log_file == stderr || log_file == stdout) {
+		switch (level) {
+		case LOG_DIE:
+			fprintf(log_file, "\033[31;1m");
+			break;
+		case LOG_ERROR:
+			fprintf(log_file, "\033[31m");
+			break;
+		case LOG_WARN:
+			fprintf(log_file, "\033[33m");
+			break;
+		case LOG_INFO:
+			fprintf(log_file, "\033[32m");
+			break;
+		default:
+			fprintf(log_file, "\033[30m");
+			break;
+		}
+	}
+}
+
+static void colour_end(void)
+{
+	if (log_file == stderr || log_file == stdout)
+		fprintf(log_file, "\033[0m");
+}
+
 void write_log(const char *file, int line, int level, const char *fmt, ...)
 {
 	if (!log_file)
@@ -55,8 +84,10 @@ void write_log(const char *file, int line, int level, const char *fmt, ...)
 	if (level >= log_level) {
 		va_list va;
 		va_start(va, fmt);
+		colour_begin(level);
 		fprintf(log_file, "%s #%d %s:%d [%s] ", str_time, (int)pid, file, line, str_levels[level]);
 		vfprintf(log_file, fmt, va);
+		colour_end();
 		fprintf(log_file, "\n");
 		va_end(va);
 	}

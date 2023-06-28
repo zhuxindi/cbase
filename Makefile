@@ -1,5 +1,5 @@
 CBASE_OBJ = stream.o buffer.o event.o rbtree.o pool.o log.o systime.o xstrings.o ring.o
-CBASE_TEST = utils_test event_test buffer_test rbtree_test stream_test pool_test xstrings_test ring_test
+CBASE_TEST = utils_test log_test event_test buffer_test rbtree_test stream_test pool_test xstrings_test ring_test
 CBASE_STATIC = libcbase.a
 CBASE_DYNAMIC = libcbase.so
 
@@ -16,6 +16,9 @@ $(CBASE_DYNAMIC): $(CBASE_OBJ)
 test: $(CBASE_TEST)
 
 utils_test: utils_test.c
+	gcc -o $@ $(CFLAGS) $^
+
+log_test: log_test.c log.o systime.o
 	gcc -o $@ $(CFLAGS) $^
 
 event_test: event_test.c event.o log.o rbtree.o systime.o
