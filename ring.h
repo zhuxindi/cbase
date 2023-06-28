@@ -55,10 +55,16 @@ static inline size_t ring_size(const struct ring *ring)
 /* get the used size of the ring */
 static inline size_t ring_used(const struct ring *ring)
 {
-	if (ring->read <= ring->write)
+	if (ring->read < ring->write)
 		return ring->write - ring->read;
-	else
+	else if (ring->read > ring->write)
 		return ring_size(ring) - (ring->read - ring->write);
+	else {
+		if (ring->read == ring->begin)
+			return 0;
+		else
+			return ring_size(ring);
+	}
 }
 
 /* get the usable size of the ring */

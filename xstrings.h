@@ -25,7 +25,7 @@ char *strstrn(const char *s1, const char *s2, size_t n);
 char *strncasestr(const char *s1, const char *s2, size_t n);
 char *strcasestrn(const char *s1, const char *s2, size_t n);
 
-/* dump every byte of src in hex, ensure dst has at least n*2+1 bytes */
+/* dump every byte of src in hex, ensure dst has at least n*2 bytes */
 char *hexdump(char *dst, const char *src, size_t n);
 
 /* base64 */
