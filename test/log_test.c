@@ -28,7 +28,7 @@ int main()
 	log_info("log_info");
 	log_warn("log_warn");
 	log_error("log_error");
-	log_die("log_die");
+	log_fatal("log_fatal");
 
 	return 0;
 }

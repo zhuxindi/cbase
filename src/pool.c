@@ -18,10 +18,10 @@ void pool_flush(struct pool *pool)
 
 	log_debug("flush pool %p", pool);
 
-	/* free all trunks in free list */
+	/* free all chunks in free list */
 	while (next) {
 		void *temp = next;
-		log_debug("free trunk %p @pool %p", temp, pool);
+		log_debug("free chunk %p @pool %p", temp, pool);
 		next = *(void **)temp;
 		pool->allocated--;
 		free(temp);
@@ -33,7 +33,7 @@ void pool_flush(struct pool *pool)
 static inline void pool_release(struct pool *pool)
 {
 	if (--pool->refcnt == 0) {
-		/* free all unused trunks */
+		/* free all unused chunks */
 		pool_flush(pool);
 
 		log_debug("destroy pool %p", pool);
@@ -72,7 +72,7 @@ static inline void *__pool_alloc(struct pool *pool)
 		return NULL;
 	}
 
-	/* alloc trunk size */
+	/* alloc chunk size */
 	ptr = malloc(pool->size);
 	if (!ptr) {
 		/* flush all pools then retry */
@@ -86,7 +86,7 @@ static inline void *__pool_alloc(struct pool *pool)
 
 	pool->allocated++;
 	pool->refcnt++;
-	log_debug("alloc trunk %p @pool %p", ptr, pool);
+	log_debug("alloc chunk %p @pool %p", ptr, pool);
 	return ptr;
 }
 
@@ -97,10 +97,10 @@ void *pool_alloc(struct pool *pool)
 	if (!ptr)
 		return __pool_alloc(pool);
 
-	/* reuse a trunk allocated before */
+	/* reuse a chunk allocated before */
 	pool->free_list = *(void **)pool->free_list;
 	pool->refcnt++;
-	log_debug("reuse trunk %p @pool %p", ptr, pool);
+	log_debug("reuse chunk %p @pool %p", ptr, pool);
 	return ptr;
 }
 
@@ -108,7 +108,7 @@ void pool_free(struct pool *pool, void *ptr)
 {
 	/* link to free list */
 	if (ptr) {
-		log_debug("recycle trunk %p @pool %p", ptr, pool);
+		log_debug("recycle chunk %p @pool %p", ptr, pool);
 		*(void **)ptr = (void *)pool->free_list;
 		pool->free_list = (void *)ptr;
 		pool_release(pool);
@@ -127,7 +127,7 @@ struct pool *pool_create(size_t size)
 		return NULL;
 	}
 
-	/* we need to write a next pointer in each trunk after pool_free,
+	/* we need to write a next pointer in each chunk after pool_free,
 	 * so we need to adjust the size up to a multiple of align
 	 */
 	pool->size = ((size + align - 1) & -align);

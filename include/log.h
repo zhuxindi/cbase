@@ -14,7 +14,7 @@ enum {
 	LOG_INFO,
 	LOG_WARN,
 	LOG_ERROR,
-	LOG_DIE,
+	LOG_FATAL,
 };
 
 /* set log level and return the old level, default level is LOG_WARN */
@@ -37,7 +37,7 @@ void write_log(const char *file, int line, int level, const char *fmt, ...);
 #define log_error(fmt, ...) \
 	write_log(__FILE__, __LINE__, LOG_ERROR, fmt, ##__VA_ARGS__)
 
-#define log_die(fmt, ...) \
-	write_log(__FILE__, __LINE__, LOG_DIE, fmt, ##__VA_ARGS__)
+#define log_fatal(fmt, ...) \
+	write_log(__FILE__, __LINE__, LOG_FATAL, fmt, ##__VA_ARGS__)
 
 #endif /* _LOG_H */
