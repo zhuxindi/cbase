@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(cbase C)
 
+include(GNUInstallDirs)
+
 set(CMAKE_C_STANDARD 99)
-option(WITH_TEST "compile test examples" OFF)
+option(ENABLE_TEST "compile test examples" OFF)
 
 add_definitions(-fPIC -pipe -O2 -W -Wall -Wpointer-arith -Wno-unused-parameter -D_GNU_SOURCE)
 
@@ -11,7 +13,7 @@ aux_source_directory(src SRC_LIST)
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
-if(WITH_TEST)
+if(ENABLE_TEST)
   add_executable(utils_test test/utils_test.c)
   target_include_directories(utils_test PRIVATE include)
   target_link_libraries(utils_test PRIVATE ${PROJECT_NAME})
@@ -48,3 +50,6 @@ if(WITH_TEST)
   target_include_directories(ring_test PRIVATE include)
   target_link_libraries(ring_test PRIVATE ${PROJECT_NAME})
 endif()
+
+install(DIRECTORY include/cbase DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
