@@ -4,8 +4,8 @@
  * Date: 2017-12-22
  */
 
-#include <ring.h>
-#include <log.h>
+#include <cbase/ring.h>
+#include <cbase/log.h>
 #include <string.h>
 
 struct ring *ring_create(size_t size)
@@ -16,7 +16,7 @@ struct ring *ring_create(size_t size)
 		log_error("alloc ring space failed");
 		return NULL;
 	}
-	
+
 	ring_init(ring, (char *)(ring + 1), size);
 	log_debug("create ring %p size=%lu begin=read=write=%p",
 		  ring, size, ring->begin);

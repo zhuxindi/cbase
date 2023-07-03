@@ -7,8 +7,8 @@
 #ifndef _STREAM_H
 #define _STREAM_H
 
-#include <event.h>
-#include <buffer.h>
+#include <cbase/event.h>
+#include <cbase/buffer.h>
 
 #define STREAM_T_RD	0x00000001
 #define STREAM_T_WR	0x00000002

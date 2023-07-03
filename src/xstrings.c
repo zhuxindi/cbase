@@ -4,7 +4,7 @@
  * Date: 2017-06-19
  */
 
-#include <xstrings.h>
+#include <cbase/xstrings.h>
 #include <ctype.h>
 
 char *strtrim(char *s)

@@ -4,9 +4,9 @@
  * Date: 2017-12-22
  */
 
-#include <ring.h>
-#include <systime.h>
-#include <log.h>
+#include <cbase/ring.h>
+#include <cbase/systime.h>
+#include <cbase/log.h>
 
 DEFINE_RING(static_ring, 20);
 

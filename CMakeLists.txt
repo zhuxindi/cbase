@@ -4,12 +4,12 @@ project(cbase C)
 set(CMAKE_C_STANDARD 99)
 option(WITH_TEST "compile test examples" OFF)
 
+add_definitions(-fPIC -pipe -O2 -W -Wall -Wpointer-arith -Wno-unused-parameter -D_GNU_SOURCE)
+
 aux_source_directory(src SRC_LIST)
 
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
-target_compile_options(${PROJECT_NAME} PRIVATE -fPIC -pipe -O2 -W -Wall -Wpointer-arith -Wno-unused-parameter)
-target_compile_definitions(${PROJECT_NAME} PRIVATE _GNU_SOURCE)
 
 if(WITH_TEST)
   add_executable(utils_test test/utils_test.c)

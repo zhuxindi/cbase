@@ -7,8 +7,8 @@
 #ifndef _BUFFER_H
 #define _BUFFER_H
 
-#include <pool.h>
-#include <list.h>
+#include <cbase/pool.h>
+#include <cbase/list.h>
 #include <stdlib.h>
 
 struct buffer {

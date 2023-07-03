@@ -7,9 +7,9 @@
 #ifndef _SYSTIME_H
 #define _SYSTIME_H
 
+#include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <time.h>
 
 extern pid_t pid;
 

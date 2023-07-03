@@ -4,9 +4,9 @@
  * Date: 2014-04-22
  */
 
-#include <stream.h>
-#include <buffer.h>
-#include <log.h>
+#include <cbase/stream.h>
+#include <cbase/buffer.h>
+#include <cbase/log.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>

@@ -4,8 +4,8 @@
  * Date: 2014-04-22
  */
 
-#include <buffer.h>
-#include <log.h>
+#include <cbase/buffer.h>
+#include <cbase/log.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>

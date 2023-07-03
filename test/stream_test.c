@@ -4,10 +4,10 @@
  * Date: 2014-04-22
  */
 
-#include <stream.h>
-#include <log.h>
-#include <systime.h>
-#include <pool.h>
+#include <cbase/stream.h>
+#include <cbase/log.h>
+#include <cbase/systime.h>
+#include <cbase/pool.h>
 #include <unistd.h>
 #include <fcntl.h>
 

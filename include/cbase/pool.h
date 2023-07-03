@@ -7,7 +7,7 @@
 #ifndef _POOL_H
 #define _POOL_H
 
-#include <list.h>
+#include <cbase/list.h>
 
 struct pool {
 	void **free_list;
