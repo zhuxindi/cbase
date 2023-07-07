@@ -23,11 +23,11 @@ struct event {
 	unsigned long when;	/* timeout for timer event */
 	struct event *buddy;	/* maybe two events point to one fd */
 	struct rb_node node;	/* timer event tree node */
-	unsigned int active:1;	/* if added before */
+	unsigned int active:1;	/* if added already */
 };
 
 /* init event module */
-int event_init(int max_events);
+int event_init(int max_io_events);
 
 /* deinit event module */
 void event_deinit(void);

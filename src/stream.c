@@ -231,8 +231,14 @@ int stream_write(struct stream *stream, struct list_head *head)
 	list_splice_tail_init(head, &stream->write_queue);
 
 	/* if the stream is writable then write at once */
-	if (stream->writable)
+	if (stream->writable) {
 		stream_write_queue(stream);
+		/* check again, maybe error occured during current writing */
+		if (stream->error) {
+			log_error("stream %p has error", stream);
+			return -1;
+		}
+	}
 	return 0;
 }
 
@@ -245,8 +251,14 @@ int stream_read(struct stream *stream, struct list_head *head)
 	}
 
 	/* if the stream is readable then read at once */
-	if (stream->readable)
+	if (stream->readable) {
 		stream_read_queue(stream);
+		/* check again, maybe error occured during current reading */
+		if (stream->error) {
+			log_error("stream %p has error", stream);
+			return -1;
+		}
+	}
 
 	/* join the read queue to head */
 	list_splice_tail_init(&stream->read_queue, head);

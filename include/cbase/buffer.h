@@ -17,7 +17,7 @@ struct buffer {
 	 */
 	char *head, *data, *tail, *end;	/* position pointers */
 	struct buffer *parent;	/* if separated from another buffer */
-	unsigned int refcnt;	/* ref counter */
+	unsigned long refcnt;	/* ref counter */
 	struct list_head list;	/* join with other buffers into a chain */
 	struct pool *pool;
 };

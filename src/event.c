@@ -77,12 +77,12 @@ static inline void __event_del_timer(struct event *ev)
 	rb_erase(&ev->node, &timer_rbtree);
 }
 
-static int event_process_timer(int limit)
+static int event_process_timer(void)
 {
 	int n;
 
 	/* iterate timer tree to process timeouted timers */
-	for (n = 0; n < limit; n++) {
+	for (n = 0; ; n++) {
 		struct event *min = __event_min_timer();
 
 		if (!min || min->when > current_msecs)
@@ -158,7 +158,7 @@ int event_wait(void)
 		n = event_process_io(n);
 
 	/* process timer events */
-	n += event_process_timer(maxevents - n);
+	n += event_process_timer();
 
 	if (n > 0)
 		log_debug("processed %d events", n);

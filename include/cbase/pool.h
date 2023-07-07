@@ -18,11 +18,11 @@ struct pool {
 	struct list_head list;
 };
 
-/* create a new pool which trunks in it have size bytes */
+/* create a new pool which chunks in it have size bytes */
 struct pool *pool_create(size_t size);
 
-/* if no trunk in use then destroy the pool right away and return NULL,
-   or return the pool and destroy it after last trunk freed */
+/* if no chunk in use then destroy the pool right away and return NULL,
+   or return the pool and destroy it after last chunk freed */
 struct pool *pool_destroy(struct pool *pool);
 
 /* flush the pool, any unused trunks will be freed */
@@ -31,13 +31,13 @@ void pool_flush(struct pool *pool);
 /* flush all pools */
 void pool_flush_all(void);
 
-/* alloc a trunk from the pool */
+/* alloc a chunk from the pool */
 void *pool_alloc(struct pool *pool);
 
-/* free a trunk */
+/* free a chunk */
 void pool_free(struct pool *pool, void *ptr);
 
-/* get trunk size */
+/* get chunk size */
 static inline size_t pool_size(const struct pool *pool)
 {
 	return pool->size;
