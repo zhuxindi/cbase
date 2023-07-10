@@ -15,7 +15,7 @@ struct pool {
 	unsigned int allocated;	/* how many chunks have been allocated */
 	unsigned int limit;	/* hard limit on the number of chunks */
 	size_t size;		/* chunk size */
-	struct list_head list;
+	struct list list;
 };
 
 /* create a new pool which chunks in it have size bytes */

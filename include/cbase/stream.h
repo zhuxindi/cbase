@@ -23,7 +23,7 @@ struct stream {
 		     eof:1;	/* stream is closed */
 	size_t rdbuf_size;	/* read buffer size */
 	struct event rev, wev;	/* read and write event */
-	struct list_head read_queue, write_queue; /* read and write queue */
+	struct list read_queue, write_queue; /* read and write queue */
 	struct pool *pool;
 };
 
@@ -38,10 +38,10 @@ int stream_attach_fd(struct stream *stream, int fd);
 void stream_detach(struct stream *stream);
 
 /* write buffer to a stream */
-int stream_write(struct stream *stream, struct list_head *head);
+int stream_write(struct stream *stream, struct list *head);
 
 /* read buffer from a stream */
-int stream_read(struct stream *stream, struct list_head *head);
+int stream_read(struct stream *stream, struct list *head);
 
 /* has a stream read eof */
 static inline int stream_eof(struct stream *stream)

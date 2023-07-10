@@ -19,7 +19,7 @@ static inline void print_buffer(struct buffer *b)
 int main()
 {
 	struct pool *pool;
-	struct list_head head = LIST_HEAD_INIT(head);
+	struct list head = LIST_INIT(head);
 	struct buffer *b, *b1, *b2;
 	int i;
 

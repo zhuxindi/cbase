@@ -17,7 +17,7 @@ static inline struct buffer *stream_get_rdbuf(struct stream *stream)
 	struct buffer *b;
 
 	/* search in the read queue try to find a buffer with free space */
-	if (!list_empty(&stream->read_queue)) {
+	if (!list_is_empty(&stream->read_queue)) {
 		b = list_last_entry(&stream->read_queue, struct buffer, list);
 		if (b->tail != b->end)
 			return b;
@@ -168,8 +168,8 @@ void stream_init(struct stream *stream, int type, size_t rdbuf_size,
 	stream->wev.buddy = &stream->rev;
 
 	/* init two queues */
-	INIT_LIST_HEAD(&stream->read_queue);
-	INIT_LIST_HEAD(&stream->write_queue);
+	list_init(&stream->read_queue);
+	list_init(&stream->write_queue);
 }
 
 int stream_attach_fd(struct stream *stream, int fd)
@@ -219,7 +219,7 @@ void stream_detach(struct stream *stream)
 	}
 }
 
-int stream_write(struct stream *stream, struct list_head *head)
+int stream_write(struct stream *stream, struct list *head)
 {
 	/* check stream status */
 	if (stream->error) {
@@ -242,7 +242,7 @@ int stream_write(struct stream *stream, struct list_head *head)
 	return 0;
 }
 
-int stream_read(struct stream *stream, struct list_head *head)
+int stream_read(struct stream *stream, struct list *head)
 {
 	/* check stream status */
 	if (stream->error) {

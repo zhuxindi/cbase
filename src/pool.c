@@ -10,7 +10,7 @@
 #include <errno.h>
 #include <string.h>
 
-static LIST_HEAD(pools);
+static DEFINE_LIST(pools);
 
 void pool_flush(struct pool *pool)
 {

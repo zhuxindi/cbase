@@ -18,7 +18,7 @@ struct buffer {
 	char *head, *data, *tail, *end;	/* position pointers */
 	struct buffer *parent;	/* if separated from another buffer */
 	unsigned long refcnt;	/* ref counter */
-	struct list_head list;	/* join with other buffers into a chain */
+	struct list list;	/* join with other buffers into a chain */
 	struct pool *pool;
 };
 
@@ -34,7 +34,7 @@ struct buffer *buffer_separate(struct buffer *b, size_t n);
 void buffer_release(struct buffer *b);
 
 /* release all buffers in the chain */
-static inline void buffer_release_chain(struct list_head *chain)
+static inline void buffer_release_chain(struct list *chain)
 {
 	struct buffer *b, *n;
 

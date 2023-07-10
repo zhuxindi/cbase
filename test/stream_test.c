@@ -20,7 +20,7 @@ int main()
 {
 	struct pool *pool;
 	struct stream rstream, wstream;
-	struct list_head buf = LIST_HEAD_INIT(buf);
+	struct list buf = LIST_INIT(buf);
 	const size_t rdbuf_len = 32;
 
 	update_pid();

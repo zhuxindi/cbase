@@ -32,7 +32,7 @@ struct buffer *buffer_create(size_t bufsize, struct pool *pool)
 	b->head = b->data = b->tail = (char *)(b+1);
 	b->end = b->head + bufsize;
 	b->pool = pool;
-	INIT_LIST_HEAD(&b->list);
+	list_init(&b->list);
 
 	log_debug("alloc buffer %p size %lu", b, bufsize);
 	return b;
@@ -70,7 +70,7 @@ struct buffer *buffer_separate(struct buffer *b, size_t n)
 	b->end = b->tail;
 
 	/* link child after b */
-	INIT_LIST_HEAD(&child->list);
+	list_init(&child->list);
 	list_add(&child->list, &b->list);
 
 	log_debug("separate buffer %p from %p at %lu parent %p",
