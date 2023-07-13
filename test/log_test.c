@@ -6,24 +6,25 @@
 
 #include <cbase/systime.h>
 #include <cbase/log.h>
+#include <fcntl.h>
 
 int main()
 {
-	FILE *f;
+	int fd;
 
 	update_pid();
 	update_sys_time();
 	set_log_level(LOG_DEBUG);
 
-	f = fopen("/tmp/cbase.log", "w");
-	set_log_file(f);
+	fd = open("/tmp/cbase.log", O_WRONLY|O_CREAT|O_TRUNC, 0644);
+	set_log_file(fd);
 	log_debug("log_debug");
 	log_info("log_info");
 	log_warn("log_warn");
 	log_error("log_error");
-	fclose(f);
+	close(fd);
 
-	set_log_file(NULL);
+	set_log_file(-1);
 	log_debug("log_debug");
 	log_info("log_info");
 	log_warn("log_warn");

@@ -6,7 +6,7 @@ include(GNUInstallDirs)
 set(CMAKE_C_STANDARD 99)
 option(ENABLE_TEST "compile test examples" OFF)
 
-add_definitions(-fPIC -pipe -O2 -W -Wall -Wpointer-arith -Wno-unused-parameter -D_GNU_SOURCE)
+add_definitions(-fPIC -pipe -O2 -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -D_GNU_SOURCE)
 
 aux_source_directory(src SRC_LIST)
 
