@@ -23,6 +23,11 @@ static const char *level_names[] = {
 	[LOG_FATAL]	= "FATAL",
 };
 
+int get_log_level(void)
+{
+	return log_level;
+}
+
 int set_log_level(int min_level)
 {
 	int ret = log_level;
@@ -33,6 +38,11 @@ int set_log_level(int min_level)
 	else if (log_level > LOG_FATAL)
 		log_level = LOG_FATAL;
 	return ret;
+}
+
+int get_log_file(void)
+{
+	return log_file;
 }
 
 int set_log_file(int fd)
@@ -49,8 +59,13 @@ static void __write_log(const char *file, int line, int level,
 	char buf[LOG_BUF_SIZE], *p = buf, *end = buf + LOG_BUF_SIZE - 1;
 	int n;
 
+#ifdef USING_VERBOSE_LOG
 	n = snprintf(p, end - p, "%s #%d %s:%d [%s] ",
 		     str_time, (int)pid, file, line, level_names[level]);
+#else
+	n = snprintf(p, end - p, "%s #%d [%s] ",
+		     str_time, (int)pid, level_names[level]);
+#endif
 	if (n < 0 || n >= end - p)
 		return;
 	p += n;

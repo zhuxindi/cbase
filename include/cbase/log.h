@@ -15,10 +15,12 @@ enum {
 	LOG_FATAL,
 };
 
-/* set log level and return the old level, default level is LOG_WARN */
+/* get/set log level, default is LOG_WARN */
+int get_log_level(void);
 int set_log_level(int min_level);
 
-/* set log file and return the old file, default file is stderr */
+/* get/set log file, default is STDERR_FILENO */
+int get_log_file(void);
 int set_log_file(int fd);
 
 void write_log(const char *file, int line, int level, const char *fmt, ...);

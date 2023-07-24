@@ -5,8 +5,12 @@ include(GNUInstallDirs)
 
 set(CMAKE_C_STANDARD 99)
 option(ENABLE_TEST "compile test examples" OFF)
+option(USING_VERBOSE_LOG "print more detailed log" OFF)
 
 add_definitions(-fPIC -pipe -O2 -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -D_GNU_SOURCE)
+if(USING_VERBOSE_LOG)
+  add_definitions(-D USING_VERBOSE_LOG)
+endif()
 
 aux_source_directory(src SRC_LIST)
 
