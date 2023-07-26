@@ -57,16 +57,11 @@ static inline void __list_del(struct list *prev, struct list *next)
 static inline void list_del(struct list *entry)
 {
 	__list_del(entry->prev, entry->next);
-}
-
-static inline void list_del_init(struct list *entry)
-{
-	__list_del(entry->prev, entry->next);
 	list_init(entry);
 }
 
 /* replace old entry by new one */
-static inline void list_replace(struct list *old, struct list *new)
+static inline void __list_replace(struct list *old, struct list *new)
 {
 	new->next = old->next;
 	new->next->prev = new;
@@ -74,9 +69,9 @@ static inline void list_replace(struct list *old, struct list *new)
 	new->prev->next = new;
 }
 
-static inline void list_replace_init(struct list *old, struct list *new)
+static inline void list_replace(struct list *old, struct list *new)
 {
-	list_replace(old, new);
+	__list_replace(old, new);
 	list_init(old);
 }
 
@@ -147,22 +142,7 @@ static inline void __list_splice(const struct list *list,
 	next->prev = last;
 }
 
-static inline void list_splice(const struct list *list,
-			       struct list *head)
-{
-	if (!list_is_empty(list))
-		__list_splice(list, head, head->next);
-}
-
-static inline void list_splice_tail(const struct list *list,
-				    struct list *head)
-{
-	if (!list_is_empty(list))
-		__list_splice(list, head->prev, head);
-}
-
-static inline void list_splice_init(struct list *list,
-				    struct list *head)
+static inline void list_splice(struct list *list, struct list *head)
 {
 	if (!list_is_empty(list)) {
 		__list_splice(list, head, head->next);
@@ -170,8 +150,7 @@ static inline void list_splice_init(struct list *list,
 	}
 }
 
-static inline void list_splice_tail_init(struct list *list,
-					 struct list *head)
+static inline void list_splice_tail(struct list *list, struct list *head)
 {
 	if (!list_is_empty(list)) {
 		__list_splice(list, head->prev, head);
